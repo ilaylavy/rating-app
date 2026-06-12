@@ -61,6 +61,12 @@ for (let i = 0; i < rows.length; i++) {
   const stars = await rows[i].$$('.star-input button')
   await stars[want[i] - 1].click()
 }
+// per-criterion note on the first criterion (Taste)
+const noteToggles = await page.$$('.note-toggle')
+await noteToggles[0].click()
+await page.waitForSelector('.crit-note-input', { timeout: 5000 })
+await page.type('.crit-note-input', 'Syrupy shot, zero bitterness')
+console.log('✓ per-criterion note added')
 await page.type('textarea', 'Tiny counter, intense espresso. The "dirty" is legendary.')
 // attach a photo through the hidden file input
 const photoInput = await page.$('input[type=file]')
@@ -78,6 +84,9 @@ await page.waitForSelector('.detail-head h1', { timeout: 5000 })
 const title = await page.$eval('.detail-head h1', (el) => el.textContent)
 if (title !== 'Bear Pond Espresso') fail(`detail title: ${title}`)
 const detailOverall = await page.$eval('.detail-overall strong', (el) => el.textContent)
+const critNote = await page.$eval('.crit-note', (el) => el.textContent)
+if (critNote !== 'Syrupy shot, zero bitterness') fail(`criterion note on detail: ${critNote}`)
+console.log('✓ per-criterion note shown on detail page')
 await page.waitForSelector('.gallery img', { timeout: 5000 })
 console.log('✓ entry saved → detail (with photo):', title, detailOverall, '★')
 await page.screenshot({ path: 'shots/4-entry-detail.png' })
@@ -119,6 +128,15 @@ const statEntries = await page.$eval('.stat-card strong', (el) => el.textContent
 if (statEntries !== '2') fail(`stats entries: ${statEntries}`)
 console.log('✓ stats page renders, entries:', statEntries)
 await page.screenshot({ path: 'shots/6-stats.png' })
+// per-category tab
+await clickByText('.chip', 'Coffee')
+await wait(300)
+const catBars = await page.$$('.bar-row')
+if (catBars.length === 0) fail('category stats tab shows no criterion bars')
+const catStatEntries = await page.$eval('.stat-card strong', (el) => el.textContent)
+if (catStatEntries !== '1') fail(`coffee tab entries: ${catStatEntries}`)
+console.log('✓ stats category tab works, coffee entries:', catStatEntries)
+await page.screenshot({ path: 'shots/6b-stats-coffee.png' })
 
 // --- 8. Categories + persistence across reload ---
 await page.goto(`${base}/#/categories`, { waitUntil: 'networkidle0' })

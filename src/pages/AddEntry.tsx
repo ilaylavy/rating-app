@@ -40,6 +40,8 @@ export default function AddEntry() {
   const [location, setLocation] = useState('')
   const [date, setDate] = useState(nowLocalInput())
   const [ratings, setRatings] = useState<Record<string, number>>({})
+  const [critNotes, setCritNotes] = useState<Record<string, string>>({})
+  const [openNotes, setOpenNotes] = useState<Set<string>>(new Set())
   const [note, setNote] = useState('')
   const [drafts, setDrafts] = useState<PhotoDraft[]>([])
   const [existingPhotos, setExistingPhotos] = useState<Photo[]>([])
@@ -62,6 +64,7 @@ export default function AddEntry() {
       setLocation(entry.location ?? '')
       setDate(isoToLocalInput(entry.date))
       setRatings(entry.ratings)
+      setCritNotes(entry.criterionNotes ?? {})
       setNote(entry.note ?? '')
       setExistingPhotos(photos)
       setLoaded(true)
@@ -108,6 +111,11 @@ export default function AddEntry() {
       setError('Create a trip first.')
       return
     }
+    const cleanedNotes = Object.fromEntries(
+      Object.entries(critNotes)
+        .map(([k, v]) => [k, v.trim()])
+        .filter(([, v]) => v),
+    )
     // eslint-disable-next-line react-hooks/purity -- runs in the save click handler, not during render
     const now = Date.now()
     const entry: Entry = {
@@ -117,6 +125,7 @@ export default function AddEntry() {
       title: title.trim(),
       location: location.trim() || undefined,
       ratings,
+      criterionNotes: Object.keys(cleanedNotes).length ? cleanedNotes : undefined,
       overall,
       note: note.trim() || undefined,
       date: new Date(date).toISOString(),
@@ -210,15 +219,45 @@ export default function AddEntry() {
 
       <div className="card">
         <h3 className="card-title">Ratings</h3>
-        {category!.criteria.map((cr) => (
-          <div className="rating-row" key={cr.id}>
-            <span>{cr.name}</span>
-            <StarInput
-              value={ratings[cr.id] ?? 0}
-              onChange={(v) => setRatings((r) => ({ ...r, [cr.id]: v }))}
-            />
-          </div>
-        ))}
+        {category!.criteria.map((cr) => {
+          const noteOpen = openNotes.has(cr.id) || !!critNotes[cr.id]
+          return (
+            <div key={cr.id}>
+              <div className="rating-row">
+                <span>{cr.name}</span>
+                <div className="rating-right">
+                  <StarInput
+                    value={ratings[cr.id] ?? 0}
+                    onChange={(v) => setRatings((r) => ({ ...r, [cr.id]: v }))}
+                  />
+                  <button
+                    type="button"
+                    className={`note-toggle ${noteOpen ? 'on' : ''}`}
+                    aria-label={`Note for ${cr.name}`}
+                    onClick={() =>
+                      setOpenNotes((s) => {
+                        const next = new Set(s)
+                        if (next.has(cr.id)) next.delete(cr.id)
+                        else next.add(cr.id)
+                        return next
+                      })
+                    }
+                  >
+                    📝
+                  </button>
+                </div>
+              </div>
+              {noteOpen && (
+                <input
+                  className="crit-note-input"
+                  value={critNotes[cr.id] ?? ''}
+                  onChange={(e) => setCritNotes((n) => ({ ...n, [cr.id]: e.target.value }))}
+                  placeholder={`Note about ${cr.name.toLowerCase()}… (optional)`}
+                />
+              )}
+            </div>
+          )
+        })}
         <div className="overall-row">
           <span>Overall</span>
           <strong>{overall > 0 ? `${overall.toFixed(1)} ★` : '—'}</strong>

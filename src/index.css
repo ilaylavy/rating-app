@@ -261,6 +261,37 @@ input[type='datetime-local'] {
   padding: 7px 0;
 }
 
+.rating-right {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.note-toggle {
+  background: none;
+  border: none;
+  font-size: 15px;
+  padding: 4px 0 4px 7px;
+  opacity: 0.35;
+}
+
+.note-toggle.on { opacity: 1; }
+
+.crit-note-input {
+  margin: 2px 0 8px;
+  padding: 8px 11px;
+  font-size: 14px;
+  border-radius: 8px;
+}
+
+.crit-note {
+  margin: 0 0 7px;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--muted);
+  white-space: pre-wrap;
+}
+
 .overall-row {
   display: flex;
   align-items: center;
@@ -825,7 +856,29 @@ input[type='datetime-local'] {
   padding: 9px 0;
 }
 
-.top-rank { font-size: 20px; }
+.top-rank {
+  font-size: 20px;
+  width: 26px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.rank-num {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.cat-jump {
+  width: 100%;
+  background: none;
+  border: none;
+  font: inherit;
+  color: var(--text);
+  text-align: left;
+}
+
+.cat-jump .chev { font-size: 18px; }
 
 .cat-stat-head {
   display: flex;

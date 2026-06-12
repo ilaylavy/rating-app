@@ -31,6 +31,8 @@ export interface Entry {
   location?: string
   /** criterion id -> 1..5 (0 / missing = unrated) */
   ratings: Record<string, number>
+  /** criterion id -> short note about that specific criterion */
+  criterionNotes?: Record<string, string>
   overall: number
   note?: string
   date: string

@@ -36,7 +36,9 @@ export default function EntryDetail() {
     navigate('/', { replace: true })
   }
 
-  const ratedCriteria = (category?.criteria ?? []).filter((c) => (entry.ratings[c.id] ?? 0) > 0)
+  const ratedCriteria = (category?.criteria ?? []).filter(
+    (c) => (entry.ratings[c.id] ?? 0) > 0 || entry.criterionNotes?.[c.id],
+  )
 
   return (
     <div className="page detail">
@@ -76,14 +78,18 @@ export default function EntryDetail() {
         <div className="card">
           <h3 className="card-title">Ratings</h3>
           {ratedCriteria.map((c) => {
-            const v = entry.ratings[c.id]
+            const v = entry.ratings[c.id] ?? 0
+            const note = entry.criterionNotes?.[c.id]
             return (
-              <div className="bar-row" key={c.id}>
-                <span className="bar-label">{c.name}</span>
-                <div className="bar">
-                  <div className="bar-fill" style={{ width: `${(v / 5) * 100}%`, background: category?.color }} />
+              <div key={c.id}>
+                <div className="bar-row">
+                  <span className="bar-label">{c.name}</span>
+                  <div className="bar">
+                    <div className="bar-fill" style={{ width: `${(v / 5) * 100}%`, background: category?.color }} />
+                  </div>
+                  <span className="bar-num">{v > 0 ? v : '—'}</span>
                 </div>
-                <span className="bar-num">{v}</span>
+                {note && <p className="crit-note">{note}</p>}
               </div>
             )
           })}
