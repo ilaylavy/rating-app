@@ -240,7 +240,15 @@ input[type='datetime-local'] {
 
 .star-input {
   display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.star-input .star-row {
+  display: flex;
   gap: 4px;
+  /* horizontal drags scrub the rating; vertical swipes still scroll the page */
+  touch-action: pan-y;
 }
 
 .star-input button {
@@ -251,8 +259,32 @@ input[type='datetime-local'] {
   transition: transform 0.08s;
 }
 
-.star-input button.on { color: var(--accent); }
 .star-input button:active { transform: scale(1.25); }
+
+.star-glyph {
+  position: relative;
+  display: inline-block;
+}
+
+.star-glyph-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0%;
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--accent);
+  pointer-events: none;
+}
+
+.star-value {
+  min-width: 27px;
+  text-align: right;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
 
 .rating-row {
   display: flex;
