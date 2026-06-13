@@ -7,6 +7,10 @@ import './index.css'
 
 registerSW({ immediate: true })
 
+// Ask the browser to mark our storage as persistent so trips, entries and
+// photos are protected from automatic eviction under disk pressure.
+navigator.storage?.persist?.().catch(() => {})
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <HashRouter>

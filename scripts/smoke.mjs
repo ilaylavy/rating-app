@@ -149,6 +149,8 @@ await page.screenshot({ path: 'shots/7-categories.png' })
 await page.reload({ waitUntil: 'networkidle0' })
 await page.goto(`${base}/#/`, { waitUntil: 'networkidle0' })
 await page.waitForSelector('.entry-card', { timeout: 5000 })
+const afterReload = await page.$$('.entry-card')
+if (afterReload.length !== 2) fail(`expected 2 cards after reload, got ${afterReload.length}`)
 console.log('✓ data persists after reload')
 
 await browser.close()

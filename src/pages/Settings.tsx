@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db'
@@ -17,6 +17,14 @@ export default function Settings() {
   const importRef = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
+  const [persisted, setPersisted] = useState<boolean>()
+
+  useEffect(() => {
+    navigator.storage
+      ?.persist?.()
+      .then(setPersisted)
+      .catch(() => {})
+  }, [])
 
   const resolvedActiveId =
     trips?.find((t) => t.id === activeTripId)?.id ?? trips?.[trips.length - 1]?.id
@@ -97,9 +105,16 @@ export default function Settings() {
       <h3 className="section-title">Your data</h3>
       <div className="card">
         <p className="muted small">
-          Everything lives only on this device. Export a backup file from time to time — you can
-          import it here on any phone or computer.
+          Everything lives only on this device — app updates never touch it. Export a backup file
+          from time to time — you can import it here on any phone or computer.
         </p>
+        {persisted !== undefined && (
+          <p className="muted small storage-status">
+            {persisted
+              ? '🔒 Storage is protected — the browser won’t auto-delete your data.'
+              : '⚠️ The browser hasn’t granted protected storage yet. Adding the app to your home screen and exporting backups keeps your data safe.'}
+          </p>
+        )}
         <button className="btn block" onClick={onExport} disabled={busy}>
           ⬇️ Export backup
         </button>
