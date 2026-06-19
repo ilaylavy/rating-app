@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type ComponentProps } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, uid, type Entry, type Photo } from '../db'
@@ -12,6 +12,18 @@ interface PhotoDraft {
   id: string
   full: Blob
   thumb: Blob
+}
+
+// Textarea that grows with its content so long notes stay fully visible.
+function AutoTextarea({ value, ...rest }: ComponentProps<'textarea'>) {
+  const ref = useRef<HTMLTextAreaElement>(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    el.style.height = 'auto'
+    el.style.height = `${el.scrollHeight}px`
+  }, [value])
+  return <textarea ref={ref} rows={1} value={value} {...rest} />
 }
 
 function DraftThumb({ draft, onRemove }: { draft: { thumb: Blob }; onRemove: () => void }) {
@@ -248,7 +260,7 @@ export default function AddEntry() {
                 </div>
               </div>
               {noteOpen && (
-                <input
+                <AutoTextarea
                   className="crit-note-input"
                   value={critNotes[cr.id] ?? ''}
                   onChange={(e) => setCritNotes((n) => ({ ...n, [cr.id]: e.target.value }))}

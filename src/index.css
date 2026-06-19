@@ -314,6 +314,9 @@ input[type='datetime-local'] {
   padding: 8px 11px;
   font-size: 14px;
   border-radius: 8px;
+  resize: none;
+  overflow: hidden;
+  line-height: 1.4;
 }
 
 .crit-note {
